@@ -9,15 +9,17 @@ export default loadAnim = () => {
     topMargin = "6vw";
   }
 
-  let targetQuery = ".landing-text-box, .project-card-parent";
+  // let targetQuery = ".landing-text-box";
+  // original
+  // let targetQuery = ".landing-text-box, .project-card-parent";
 
   //get cookies
   var hasVisited = sessionStorage.getItem("washere");
 
-  anime.set(targetQuery, {
-    opacity: 0,
-    translateY: "4vh",
-  });
+  // anime.set(targetQuery, {
+  //   opacity: 0,
+  //   translateY: "4vh",
+  // });
 
   anime.set("#hamburger, .logos-box, #mute-btn-container", {
     opacity: 0,
@@ -54,12 +56,12 @@ export default loadAnim = () => {
       delay: anime.stagger(500, { start: delay }),
     });
 
-    anime({
-      targets: targetQuery,
-      opacity: { value: 1, duration: 800, easing: "easeOutSine" },
-      translateY: { value: 0, duration: 1000, easing: "easeOutQuad" },
-      delay: anime.stagger(500, { start: delay + 1000 }),
-    });
+    // anime({
+    //   targets: targetQuery,
+    //   opacity: { value: 1, duration: 800, easing: "easeOutSine" },
+    //   translateY: { value: 0, duration: 1000, easing: "easeOutQuad" },
+    //   delay: anime.stagger(500, { start: delay + 1000 }),
+    // });
   };
   const visited = (delay) => {
     $(".body-dark").css({ overflow: "visible" });
@@ -81,16 +83,16 @@ export default loadAnim = () => {
       delay: anime.stagger(500, { start: delay }),
     });
 
-    anime({
-      targets: targetQuery,
-      opacity: { value: 1, duration: 0, easing: "easeOutSine" },
-      translateY: {
-        value: ["0vh", "0vh"],
-        duration: 1000,
-        easing: "easeOutQuad",
-      },
-      delay: anime.stagger(500, { start: delay + 1000 }),
-    });
+    // anime({
+    //   targets: targetQuery,
+    //   opacity: { value: 1, duration: 0, easing: "easeOutSine" },
+    //   translateY: {
+    //     value: ["0vh", "0vh"],
+    //     duration: 1000,
+    //     easing: "easeOutQuad",
+    //   },
+    //   delay: anime.stagger(500, { start: delay + 1000 }),
+    // });
   };
 
   //if page has been visited - don't animate

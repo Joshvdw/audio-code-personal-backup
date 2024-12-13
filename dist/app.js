@@ -533,45 +533,40 @@ function hmrAcceptRun(bundle, id) {
 
 },{}],"igcvL":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-var _aboutLottie = require("./js/global/about/aboutLottie");
-var _aboutLottieDefault = parcelHelpers.interopDefault(_aboutLottie);
 var _copyEmail = require("./js/global/copyEmail");
 var _copyEmailDefault = parcelHelpers.interopDefault(_copyEmail);
 var _initCms = require("./js/global/initCms");
 var _initCmsDefault = parcelHelpers.interopDefault(_initCms);
-var _logCareers = require("./js/global/logCareers");
-var _logCareersDefault = parcelHelpers.interopDefault(_logCareers);
 var _preloader = require("./js/global/preloader");
 var _projectLotties = require("./js/global/projectLotties");
 var _projectLottiesDefault = parcelHelpers.interopDefault(_projectLotties);
 var _loadAnim = require("./js/home/loadAnim");
 var _loadAnimDefault = parcelHelpers.interopDefault(_loadAnim);
-var _setLogoHref = require("./js/pitches/setLogoHref");
-var _setLogoHrefDefault = parcelHelpers.interopDefault(_setLogoHref);
 var _audio = require("./js/global/audio");
 var _audioDefault = parcelHelpers.interopDefault(_audio);
 var _showreel = require("./js/global/showreel");
 var _bugFixes = require("./js/global/bugFixes");
+var _dynamicVideos = require("./js/global/dynamicVideos");
 const parceled = true; // for checking localhost vs github pages / CDN
 const currentPage = window.location.pathname;
 const homePage = currentPage == "/";
 const onReady = ()=>{
-    // alert("local");
     (0, _preloader.readyPreloader)(); // hides preloader and add event listener for frog lottie
-    const page = window.location.pathname.split("/").pop();
     const audio = (0, _audioDefault.default)(homePage); // adds music, ui-sounds and mute-lottie functionality
-    if (homePage) (0, _showreel.showreelHome)(audio); // code for homepage showreel video
+    (0, _dynamicVideos.responsiveNavShowreel)();
+    if (homePage) {
+        (0, _dynamicVideos.setAllHomepageVideoSources)();
+        (0, _dynamicVideos.lazyLoadHomeVideos)();
+        (0, _showreel.showreelHome)(audio); // code for homepage showreel video
+    }
     (0, _showreel.showreelNav)(audio); // code for nav showreel video
-    (0, _logCareersDefault.default)(); // logs a frog and message to the console
     (0, _projectLottiesDefault.default)(); // initiates project lotties for home and work pages
     (0, _copyEmailDefault.default)(); // copies email to clipboard in footer
     (0, _initCmsDefault.default)(); // sets color hovers and cms filtering style for work page & content hub
     document.querySelector(".landing-video-container") && (0, _loadAnimDefault.default)(); // for home page intro anim
-    document.querySelector(".client-link") && (0, _setLogoHrefDefault.default)();
     document.querySelectorAll(".article-rich-text a").forEach((e)=>{
         e.target = "_blank";
     });
-    page == "about" && (0, _aboutLottieDefault.default)();
     (0, _bugFixes.stopCmdClick)(); // prevent command click from triggering page transition
 };
 const onLoading = ()=>{
@@ -594,47 +589,36 @@ const handleEscape = (e)=>{
 };
 window.addEventListener("keydown", handleEscape);
 
-},{"./js/global/about/aboutLottie":"8Krlv","./js/global/copyEmail":"aI83l","./js/global/initCms":"3jJBr","./js/global/logCareers":"DcFUA","./js/global/preloader":"gnoda","./js/global/projectLotties":"2KQxL","./js/home/loadAnim":"4gmyN","./js/pitches/setLogoHref":"1c4zC","./js/global/audio":"bc3EI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./js/global/showreel":"iVfHp","./js/global/bugFixes":"lTFyP"}],"8Krlv":[function(require,module,exports) {
+},{"./js/global/copyEmail":"aI83l","./js/global/initCms":"3jJBr","./js/global/preloader":"gnoda","./js/global/projectLotties":"2KQxL","./js/home/loadAnim":"4gmyN","./js/global/audio":"bc3EI","./js/global/showreel":"iVfHp","./js/global/bugFixes":"lTFyP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./js/global/dynamicVideos":"8GDbY"}],"aI83l":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-exports.default = aboutLottie = ()=>{
-    var availableLotties = [];
-    //var lastLottie = null
-    //var lastLotties = []
-    var lotties = [
-        ...document.querySelectorAll("lottie-player")
-    ];
-    availableLotties = lotties.filter((l)=>l.getAttribute("src") != "");
-    // method 1, timeout
-    setInterval(function() {
-        // Function runs every 800 milliseconds (the duration of the lottie animations)     
-        if (availableLotties.length == 0) return;
-        // Select a random lottie
-        var selectedIndex = getRandomInt(availableLotties.length);
-        var selectedLottie = availableLotties[selectedIndex];
-        // play lottie
-        if (selectedLottie) {
-            selectedLottie.seek(0);
-            selectedLottie.play();
-        }
-        //remove the item from array as the lottie plays on loop
-        availableLotties.splice(selectedIndex, 1);
-    }, 500);
-    document.querySelectorAll(".team-box").forEach((e)=>{
-        const video = e.querySelector("video");
-        let isPlaying = false;
-        video.onplaying = ()=>isPlaying = true;
-        video.onpause = ()=>isPlaying = false;
-        video.pause();
-        e.addEventListener("mouseenter", ()=>{
-            video.paused && !isPlaying && video.play();
+exports.default = copyEmail = ()=>{
+    function copyToClipboard(copyText) {
+        // copies text to keyboard by creating then deleting selectable text area
+        const el = document.createElement("textarea");
+        el.value = copyText;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        // change text of header
+        $(".footer-title-roller-down").each(function() {
+            $(this).html("E-mail copied to clipboard");
         });
-        e.addEventListener("mouseleave", ()=>{
-            !video.paused && isPlaying && video.pause();
-        });
+        // reset text of header after 1000 ms
+        setTimeout(function() {
+            $(".footer-title-roller-down").each(function() {
+                $(this).html("Copy email");
+            });
+        }, 1400);
+    }
+    var remoteHelloBlock = document.getElementById("hello");
+    remoteHelloBlock.addEventListener("click", function() {
+        copyToClipboard("hello@psychoactive.co.nz");
+    });
+    var careersBlock = document.getElementById("careers");
+    careersBlock.addEventListener("click", function() {
+        copyToClipboard("careers@psychoactive.co.nz");
     });
 };
 
@@ -668,40 +652,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"aI83l":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = copyEmail = ()=>{
-    function copyToClipboard(copyText) {
-        // copies text to keyboard by creating then deleting selectable text area
-        const el = document.createElement("textarea");
-        el.value = copyText;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand("copy");
-        document.body.removeChild(el);
-        // change text of header
-        $(".footer-title-roller-down").each(function() {
-            $(this).html("E-mail copied to clipboard");
-        });
-        // reset text of header after 1000 ms
-        setTimeout(function() {
-            $(".footer-title-roller-down").each(function() {
-                $(this).html("Copy email");
-            });
-        }, 1400);
-    }
-    var remoteHelloBlock = document.getElementById("hello");
-    remoteHelloBlock.addEventListener("click", function() {
-        copyToClipboard("hello@psychoactive.co.nz");
-    });
-    var careersBlock = document.getElementById("careers");
-    careersBlock.addEventListener("click", function() {
-        copyToClipboard("careers@psychoactive.co.nz");
-    });
-};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3jJBr":[function(require,module,exports) {
+},{}],"3jJBr":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = initCms = ()=>{
@@ -753,49 +704,6 @@ exports.default = initCms = ()=>{
         }, 300);
     });
 };
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"DcFUA":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = logCareers = ()=>console.log(`
-We're the best. No cap.
-
-Sup beans!
-Check out here if you want to join the team: https://psychoactive.co.nz/careers
-
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@    .@@.     ,@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@                           @@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@                          @@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@      .@@@@@@@@@@.                         @@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@                                              @@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@                                                   @@@@@@@@@@@@@@@
-@@@@@@@@@@@@                                                      @@@@@@@@@@@@@@
-@@@@@@@@@@@                                                       @@@@@@@@@@@@@@
-@@@@@@@@@.                                                       ,@@@@@@@@@@@@@@
-@@@@@@@@              @                        @@@@@@@@@@        @@@@@@@@@@@@@@@
-@@@@@@@@            .@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@       @@@@@@@@@@@@@@@@@
-@@@@@@@                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@.       @@@@@@@@@@     @@@@@
-@@@@@@,                  @@@@@@@@@@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@     @@@@@
-@@@@@@                    @@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@      @@@@@
-@@@@@@                     @@@@@@@@@@@@@@@@@@@@.    @@@@@@@@@@@@@@@@@      @@@@@
-@@@@@@                     @@@@@@@@@@@@@@@@@@@@,    @@@@@@@@@@@@@@@@       @@@@@
-@@@@@@@                      @@@@@@@@@@@@@@@@@@@      @@@@@@@@@@@@@        @@@@@
-@@@@@@@                        @@@@@@@@@@@@@@@@@@       @@@@@@@@           @@@@@
-@@@@@@@@                         @@@@@@@@@@@@@@@@@,                       @@@@@@
-@@@@@@@@@                            @@@@@@@@@@@@@@@@                    @@@@@@@
-@@@@@@@@@@                                  .@@@@@@                     @@@@@@@@
-@@@@@@@@@@@                                                           .@@@@@@@@@
-@@@@@@@@@@@@@                                                        @@@@@@@@@@@
-@@@@@@@@@@@@@@@                                                    @@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@                                               ,@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@                                         ,@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@                                  @@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.                      @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-`);
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gnoda":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -944,26 +852,24 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function initProjectLotties() {
     // check if lottie players exist 
-    if (document.querySelectorAll("lottie-player").length > 0) {
-        // create array with all lotie players
-        var allLotties = [
-            ...document.querySelectorAll("lottie-player")
-        ];
-        //var allLottiesHover = document.querySelectorAll('.hover-lottie-wrapper')
-        let isMobile = window.innerWidth < 428;
-        // create new array from lotties if it doesn't have a source attribute
-        allLotties = allLotties.filter((l)=>!l.hasAttribute("src"));
-        allLotties.forEach((e)=>{
-            // get source based to mobile or desktop based on mobile / screen width
-            let source = isMobile ? e.getAttribute("mobile-source") : e.getAttribute("desktop-source");
-            // if source is not empty, load the source into each lottie player
-            if (source != "") e.load(source);
-        });
-        // remove safari placeholder 
-        document.querySelectorAll(".safari-image").forEach((e)=>{
-            e.remove();
-        });
-    }
+    if (document.querySelectorAll("lottie-player").length > 0) // create array with all lotie players
+    // var allLotties = [...document.querySelectorAll('lottie-player')]
+    // //var allLottiesHover = document.querySelectorAll('.hover-lottie-wrapper')
+    // let isMobile = window.innerWidth < 428
+    // // create new array from lotties if it doesn't have a source attribute
+    // allLotties = allLotties.filter( l => !l.hasAttribute('src'))
+    // allLotties.forEach( e => {
+    //   // get source based to mobile or desktop based on mobile / screen width
+    //   let source = isMobile ? e.getAttribute('mobile-source') : e.getAttribute('desktop-source')
+    //   // if source is not empty, load the source into each lottie player
+    //   if(source != ''){
+    //     e.load(source)
+    //   }
+    // })
+    // remove safari placeholder 
+    document.querySelectorAll(".safari-image").forEach((e)=>{
+        e.remove();
+    });
 } //   // Play lotties one randomly and one at a time for performance
  //   function isInViewport(el) {
  //     var rect = el.getBoundingClientRect()
@@ -1026,13 +932,15 @@ exports.default = loadAnim = ()=>{
     var topMargin;
     if ($(window).width() <= 1024) topMargin = "15vh";
     else topMargin = "6vw";
-    let targetQuery = ".landing-text-box, .project-card-parent";
+    // let targetQuery = ".landing-text-box";
+    // original
+    // let targetQuery = ".landing-text-box, .project-card-parent";
     //get cookies
     var hasVisited = sessionStorage.getItem("washere");
-    (0, _animejsDefault.default).set(targetQuery, {
-        opacity: 0,
-        translateY: "4vh"
-    });
+    // anime.set(targetQuery, {
+    //   opacity: 0,
+    //   translateY: "4vh",
+    // });
     (0, _animejsDefault.default).set("#hamburger, .logos-box, #mute-btn-container", {
         opacity: 0,
         translateY: "-4vh"
@@ -1087,22 +995,12 @@ exports.default = loadAnim = ()=>{
                 start: delay
             })
         });
-        (0, _animejsDefault.default)({
-            targets: targetQuery,
-            opacity: {
-                value: 1,
-                duration: 800,
-                easing: "easeOutSine"
-            },
-            translateY: {
-                value: 0,
-                duration: 1000,
-                easing: "easeOutQuad"
-            },
-            delay: (0, _animejsDefault.default).stagger(500, {
-                start: delay + 1000
-            })
-        });
+    // anime({
+    //   targets: targetQuery,
+    //   opacity: { value: 1, duration: 800, easing: "easeOutSine" },
+    //   translateY: { value: 0, duration: 1000, easing: "easeOutQuad" },
+    //   delay: anime.stagger(500, { start: delay + 1000 }),
+    // });
     };
     const visited = (delay)=>{
         $(".body-dark").css({
@@ -1148,25 +1046,16 @@ exports.default = loadAnim = ()=>{
                 start: delay
             })
         });
-        (0, _animejsDefault.default)({
-            targets: targetQuery,
-            opacity: {
-                value: 1,
-                duration: 0,
-                easing: "easeOutSine"
-            },
-            translateY: {
-                value: [
-                    "0vh",
-                    "0vh"
-                ],
-                duration: 1000,
-                easing: "easeOutQuad"
-            },
-            delay: (0, _animejsDefault.default).stagger(500, {
-                start: delay + 1000
-            })
-        });
+    // anime({
+    //   targets: targetQuery,
+    //   opacity: { value: 1, duration: 0, easing: "easeOutSine" },
+    //   translateY: {
+    //     value: ["0vh", "0vh"],
+    //     duration: 1000,
+    //     easing: "easeOutQuad",
+    //   },
+    //   delay: anime.stagger(500, { start: delay + 1000 }),
+    // });
     };
     //if page has been visited - don't animate
     if (hasVisited || $(window).width() <= 1024) {
@@ -2482,37 +2371,12 @@ anime.random = function(min, max) {
 };
 exports.default = anime;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1c4zC":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = setLogoHref = ()=>{
-    console.log(`Checking out or code uh ? We'll write some for ya !`);
-    // macth link from the rich text list to each logo image
-    var linkArray = Array.from(document.querySelectorAll(".link-list ul li a"));
-    var allResourcesLink = Array.from(document.querySelectorAll(".client-link"));
-    linkArray.forEach((link, i)=>{
-        var href = link.getAttribute("href");
-        // Set logo link
-        allResourcesLink.forEach((resource, index)=>{
-            if (i === index) resource.setAttribute("href", href);
-        });
-    });
-    var all_links = document.querySelectorAll(".w-lightbox");
-    all_links.forEach((e)=>{
-        e.removeAttribute("href");
-    });
-//for(var i=0; i<all_links.length; i++){
-//    all_links[i].removeAttribute("href");
-//    console.log("remove");
-//}
-};
-
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bc3EI":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function audioImplementation(homePage) {
-    const showreelHome = document.querySelector("#showreel_home");
-    const showreelNav = document.querySelector("#showreel_nav");
+    const showreelHome = document.querySelector("#showreel_video");
+    const showreelNav = document.querySelector("#showreelNavXL_video");
     // MOBILE CHECK
     window.mobileCheck = function() {
         let check = false;
@@ -2967,9 +2831,10 @@ function showreelHome(audio) {
     const fadeMusicToggle = audio.fadeToggle;
     const showreelMuteState = audio.getShowreelMuteState;
     const homeBlock = document.querySelector("#showreel_block_home");
-    const showreelVideo = document.querySelector("#showreel_home");
+    const showreelVideo = document.querySelector("#showreel_video");
     const clickToUnmuteUI = document.querySelector(".showreel-ui-wrapper");
     const clickToMuteUI = document.querySelector(".showreel-ui-wrapper-2");
+    const soundBtns = Array.from(document.querySelectorAll(".showreel-sound-button"));
     showreelVideo.volume = 0.7;
     let clickLogic = "none";
     let outOfView = false;
@@ -2991,7 +2856,6 @@ function showreelHome(audio) {
     });
     // FIRST CLICK LOGIC
     function firstClickLogic() {
-        console.log("first click logic");
         showreelVideo.muted = false; //unmute video
         showreelVideo.currentTime = 0; //restart video
         clickToUnmuteUI.style.display = "none"; //hide unmute ui
@@ -3002,7 +2866,6 @@ function showreelHome(audio) {
     }
     // SECOND CLICK LOGIC
     function secondClickLogic() {
-        console.log("second click logic");
         showreelVideo.muted = true; //mute video again
         if (!showreelMuteState()) fadeMusicToggle(); //if unmuted, toggle music fade
         clickToUnmuteUI.style.opacity = "100"; // set unmute opacity to 100
@@ -3012,7 +2875,6 @@ function showreelHome(audio) {
     }
     // THIRD CLICK LOGIC
     function thirdClickLogic() {
-        console.log("third click logic");
         showreelVideo.muted = false; //unmute video
         if (!showreelMuteState()) fadeMusicToggle(); //if unmuted, toggle music fade
         clickToUnmuteUI.style.display = "none"; //hide unmute ui
@@ -3035,33 +2897,17 @@ function showreelHome(audio) {
     });
     // initial show / hide on hover
     homeBlock.addEventListener("mouseenter", ()=>{
-        const muteStyle = window.getComputedStyle(clickToMuteUI);
         const unMuteStyle = window.getComputedStyle(clickToUnmuteUI);
-        console.log(muteStyle.display == "none");
-        if (unMuteStyle.display == "none" && showreelVideo.muted) {
-            console.log("show unmute");
-            clickToUnmuteUI.style.display = "flex";
-        }
-    // if (muteStyle.display == "none" && !showreelVideo.muted) {
-    //   console.log("show mute");
-    //   clickToMuteUI.style.display = "flex";
-    // }
+        if (unMuteStyle.display == "none" && showreelVideo.muted) clickToUnmuteUI.style.display = "flex";
     });
-    clickToUnmuteUI.addEventListener("mouseout", ()=>{
+    // hover out interaction with checks to ensure its not hovering out into the sound btns itself
+    clickToUnmuteUI.addEventListener("mouseout", (event)=>{
         const unMuteStyle = window.getComputedStyle(clickToUnmuteUI);
-        if (unMuteStyle.display == "flex" && showreelVideo.muted) {
-            console.log("hide unmute");
-            clickToUnmuteUI.style.display = "none";
-        }
+        // Check if the mouse is still over clickToUnmuteUI or any soundBtns
+        const isHoveringSoundBtns = soundBtns.some((btn)=>btn.contains(event.relatedTarget));
+        const isHoveringClickToUnmute = clickToUnmuteUI.contains(event.relatedTarget);
+        if (!isHoveringSoundBtns && !isHoveringClickToUnmute && unMuteStyle.display === "flex" && showreelVideo.muted) clickToUnmuteUI.style.display = "none";
     });
-    // homeBlock.addEventListener("mouseout", () => {
-    //   console.log("hovered out");
-    //   const muteStyle = window.getComputedStyle(clickToMuteUI);
-    //   if (muteStyle.display == "flex" && !showreelVideo.muted) {
-    //     console.log("hide mute");
-    //     clickToMuteUI.style.display = "none";
-    //   }
-    // });
     // catch if user hovers off showreel, after clicking once
     showreelVideo.addEventListener("mouseout", function() {
         const clickedOnce = clickLogic == "once";
@@ -3075,13 +2921,12 @@ function showreelNav(audio) {
     const showreelMuteState = audio.getShowreelMuteState;
     const navPlayReel = document.querySelector(".navbar_playreel-wrapper");
     const wave = document.querySelectorAll(".wave");
-    const showreelVideo = document.querySelector("#showreel_nav");
+    const showreelVideo = document.querySelector("#showreelNavXL_video");
     showreelVideo.volume = 0.7;
     // on showreel-nav click
     navPlayReel.addEventListener("click", ()=>{
         showreelVideo.muted = false; //unmute video
         showreelVideo.currentTime = 0; //restart video
-        console.log(!showreelMuteState());
         if (!showreelMuteState()) fadeMusicToggle(); //if unmuted, toggle music fade
         wave.forEach((stroke)=>{
             stroke.style.fill = "#F5F4F2"; //set mute svg fill back to white
@@ -3105,6 +2950,91 @@ function stopCmdClick() {
             element.setAttribute("style", "visibility:hidden !important");
         });
     });
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8GDbY":[function(require,module,exports) {
+// dynamically set video sources based on screen size
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+// call to set all nav showreel video sources
+parcelHelpers.export(exports, "responsiveNavShowreel", ()=>responsiveNavShowreel);
+// call to set all homepage video sources
+parcelHelpers.export(exports, "setAllHomepageVideoSources", ()=>setAllHomepageVideoSources);
+// Main function to lazy load home videos
+parcelHelpers.export(exports, "lazyLoadHomeVideos", ()=>lazyLoadHomeVideos);
+function setVideoSource(video) {
+    const videoElem = document.getElementById(`${video}_video`);
+    let videoSrc = "";
+    if (window.innerWidth <= 560) videoSrc = getURL(video, "mobile");
+    else if (window.innerWidth <= 1680) videoSrc = getURL(video, "laptop");
+    else videoSrc = getURL(video, "desktop");
+    // Check if the current source is already set
+    if (videoElem.getAttribute("src") !== videoSrc) videoElem.src = videoSrc;
+    // Preload only if the video is already in the viewport
+    const isInViewport = (elem)=>{
+        const rect = elem.getBoundingClientRect();
+        return rect.top < (window.innerHeight || document.documentElement.clientHeight) && rect.bottom > 0 && rect.left < (window.innerWidth || document.documentElement.clientWidth) && rect.right > 0;
+    };
+    if (isInViewport(videoElem) && videoElem.paused) videoElem.play().catch((error)=>{
+        console.warn(`Failed to autoplay video: ${video}`, error);
+    });
+}
+function responsiveNavShowreel() {
+    function satNavSources() {
+        setVideoSource("showreelNav");
+        setVideoSource("showreelNavXL");
+    }
+    satNavSources();
+    debounceWindowResizedListener(satNavSources);
+}
+function setAllHomepageVideoSources() {
+    function setAllVideoSources() {
+        setVideoSource("oasis");
+        setVideoSource("showreel");
+        setVideoSource("sgf");
+        setVideoSource("metamorphoses");
+    }
+    setAllVideoSources();
+    debounceWindowResizedListener(setAllVideoSources);
+}
+function lazyLoadHomeVideos() {
+    // SGF VIDEO
+    setupLazyLoad(document.getElementById("sgf_video"), document.getElementById("project-thumbnails"));
+    // OASIS VIDEO
+    setupLazyLoad(document.getElementById("oasis_video"), document.getElementById("project-thumbnails-2"));
+    // SHOWREEL VIDEO
+    setupLazyLoad(document.getElementById("showreel_video"), document.getElementById("project-thumbnails-3"));
+    // HERO TESSELATION VIDEO
+    setupLazyLoad(document.getElementById("metamorphoses_video"), document.getElementById("metamorphoses_video"));
+}
+// UTILITY FUNCTIONS
+// set up IntersectionObserver for lazy loading videos
+function setupLazyLoad(videoElement, triggerElement) {
+    const observer = new IntersectionObserver(([entry])=>{
+        if (entry.isIntersecting) {
+            videoElement.setAttribute("preload", "auto"); // Preload the video
+            videoElement.play(); // Play the video
+            observer.unobserve(triggerElement); // Stop observing after triggering
+        }
+    }, {
+        threshold: 0
+    });
+    observer.observe(triggerElement); // Start observing the trigger element
+}
+// render new video source based on window screen size change event
+function debounceWindowResizedListener(func) {
+    let resizeTimeout;
+    window.addEventListener("resize", ()=>{
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(func, 500);
+    });
+}
+// return correct digital ocean url
+function getURL(video, device) {
+    let url;
+    if (video.includes("Nav")) url = `https://psychoactive-website-media.sfo3.cdn.digitaloceanspaces.com/Responsive-Videos/showreel_${device}.mp4`;
+    else url = `https://psychoactive-website-media.sfo3.cdn.digitaloceanspaces.com/Responsive-Videos/${video}_${device}.mp4`;
+    return url;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["4MuEU","igcvL"], "igcvL", "parcelRequirebfdf")
